@@ -13,5 +13,12 @@ class AppUrls {
   // ================= HELPLINE =================
 
   /// Get Helpline Numbers & Names
-  static const String helplineNumbers = '$baseUrl/api/HelplineNumbers&Names';
+  static const String helplineNumbers =
+      '$baseUrl/api/HelplineNumbers&Names';
+
+  // ================= HOME =================
+
+  /// Get Mobile Menus for Home Screen
+  static const String mobileMenus =
+      '$baseUrl/api/MobileMenus';
 }
