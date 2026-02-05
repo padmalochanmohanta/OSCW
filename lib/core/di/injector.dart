@@ -1,5 +1,24 @@
 // lib/core/di/injector.dart
 import 'package:get_it/get_it.dart';
+import 'package:oscw/core/constants/app_urls.dart';
+import 'package:oscw/features/complaint/data/datasource/complain_regitration_remote_ds.dart';
+import 'package:oscw/features/complaint/data/datasource/track_complaint_remote_ds.dart';
+import 'package:oscw/features/complaint/data/repository_impl/complain_dropdown_repository_impl.dart';
+import 'package:oscw/features/complaint/data/repository_impl/complain_registration_repo_impl.dart';
+import 'package:oscw/features/complaint/data/repository_impl/district_repo_impl.dart';
+import 'package:oscw/features/complaint/data/repository_impl/track_complaint_repo_impl.dart';
+import 'package:oscw/features/complaint/domain/repository/complain_dropdown_repository.dart';
+import 'package:oscw/features/complaint/domain/repository/complain_registration_repo.dart';
+import 'package:oscw/features/complaint/domain/repository/district_repo.dart';
+import 'package:oscw/features/complaint/domain/repository/track_complaint_repository.dart';
+import 'package:oscw/features/complaint/domain/usecase/get_compain_dropdwon.dart';
+import 'package:oscw/features/complaint/domain/usecase/get_complain_registration.dart';
+import 'package:oscw/features/complaint/domain/usecase/get_district_usecase.dart';
+import 'package:oscw/features/complaint/domain/usecase/search_complaint_usecase.dart';
+import 'package:oscw/features/complaint/presentation/bloc/complain_dropdown_bloc.dart';
+import 'package:oscw/features/complaint/presentation/bloc/complaint_registration/complaint_bloc.dart';
+import 'package:oscw/features/complaint/presentation/bloc/district/district_bloc.dart';
+import 'package:oscw/features/complaint/presentation/bloc/track_complaint/track_complaint_bloc.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 // Core
@@ -30,6 +49,8 @@ Future<void> initializeDependencies() async {
   await SharedPreferences.getInstance();
   sl.registerSingleton<SharedPreferences>(sharedPreferences);
 
+
+
   // ---------------- CORE ----------------
   sl.registerLazySingleton<Preferences>(() => Preferences(sharedPreferences));
   sl.registerLazySingleton<ConnectivityService>(() => ConnectivityService());
@@ -47,8 +68,8 @@ Future<void> initializeDependencies() async {
   sl.registerFactory<InternetBloc>(() => InternetBloc(networkInfo: sl()));
 
   // ======================================================
-//                   SETTINGS FEATURE
-// ======================================================
+  //                   SETTINGS FEATURE
+  // ======================================================
 
 // Datasource
   sl.registerLazySingleton<SettingsLocalDataSource>(
@@ -73,5 +94,70 @@ Future<void> initializeDependencies() async {
     getLocale: sl(),
     setLocale: sl(),
   ));
+
+  // ======================================================
+//                DROPDOWN FEATURE (Complaint Type)
+// ======================================================
+
+// Repository
+sl.registerLazySingleton<DropdownRepository>(
+  () => DropdownRepositoryImpl(
+    apiUrl: AppUrls.typeofcompalins,
+  ),
+);
+
+// Use case
+sl.registerLazySingleton(
+  () => GetDropdownItemsUseCase(sl()),
+);
+
+// Bloc
+sl.registerFactory(
+  () => DropdownBloc(getDropdownItems: sl()),
+);
+
+// Repository
+sl.registerLazySingleton<DistrictRepository>(
+  () => DistrictRepositoryImpl(apiUrl: AppUrls.district),
+);
+
+// UseCase
+sl.registerLazySingleton(() => GetDistrictsUseCase(sl()));
+
+// Bloc
+sl.registerFactory(() => DistrictBloc(getDistricts: sl()));
+
+// ---------------- DATASOURCE ----------------
+  sl.registerLazySingleton<ComplaintRemoteDataSource>(
+    () => ComplaintRemoteDataSourceImpl(),
+  );
+
+  // ---------------- REPOSITORY ----------------
+  sl.registerLazySingleton<ComplaintRepository>(
+    () => ComplaintRepositoryImpl(remoteDataSource: sl()),
+  );
+
+  // ---------------- USE CASE ----------------
+  sl.registerLazySingleton<SubmitComplaintUseCase>(
+    () => SubmitComplaintUseCase(sl()),
+  );
+
+  // ---------------- BLOC ----------------
+  sl.registerFactory<ComplaintBloc>(
+    () => ComplaintBloc(submitComplaint: sl()),
+  );
+
+// Data
+// In your DI setup (main.dart or di.dart)
+sl.registerLazySingleton<TrackComplaintRemoteDataSource>(
+    () => TrackComplaintRemoteDataSourceImpl());
+
+sl.registerLazySingleton<TrackComplaintRepository>(
+    () => TrackComplaintRepositoryImpl(sl()));
+
+sl.registerLazySingleton(() => SearchComplaintUseCase(sl()));
+
+sl.registerFactory(() => TrackComplaintBloc(sl())); 
+
 
 }

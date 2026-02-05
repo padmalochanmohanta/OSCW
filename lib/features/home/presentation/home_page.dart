@@ -1,13 +1,14 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:oscw/core/theme/theme_bloc.dart';
+import 'package:oscw/core/theme/theme_state.dart';
+import 'package:oscw/shared_widgets/home_menu_helper.dart';
 
 import '../../../../core/internet/internet_bloc.dart';
 import '../../../../core/internet/internet_state.dart';
 import '../../../../core/localization/app_localizations.dart';
 import '../../../../core/constants/app_images.dart';
 import '../../../../routes/app_routes.dart';
-
-import '../../../../shared_widgets/app_image.dart';
 import '../../../../shared_widgets/no_internet_banner.dart';
 import '../../../shared_widgets/app_app_bar.dart';
 
@@ -34,7 +35,12 @@ class _HomePageState extends State<HomePage> {
     _menuFuture = _repo.getMobileMenus();
   }
 
-  /// 🔁 Route mapping (NO UI CHANGE)
+  /// Creates a fresh future per theme change
+  Future<List<MobileMenuModel>> _menuFutureForTheme(ThemeMode themeMode) {
+    return _repo.getMobileMenus();
+  }
+
+  /// Route mapping
   String _routeFromMenu(String name) {
     switch (name) {
       case 'OSCW Toll Free Number':
@@ -57,14 +63,26 @@ class _HomePageState extends State<HomePage> {
   @override
   Widget build(BuildContext context) {
     final t = AppLocalizations.of(context);
+    final langCode = Localizations.localeOf(context).languageCode;
 
     return Scaffold(
-      appBar: AppAppBar(
-        title: t.translate("home_title"),
+      drawer: _buildMenuDrawer(context, langCode),
+      appBar: PreferredSize(
+        preferredSize: const Size.fromHeight(64),
+        child: Builder(
+          builder: (context) {
+            return AppAppBar(
+              title: t.translate("home_title"),
+              onMenuTap: () {
+                Scaffold.of(context).openDrawer();
+              },
+            );
+          },
+        ),
       ),
       body: Column(
         children: [
-          /// 🌐 INTERNET STATUS
+          /// INTERNET STATUS
           BlocBuilder<InternetBloc, InternetState>(
             builder: (context, state) {
               return NoInternetBanner(
@@ -73,106 +91,129 @@ class _HomePageState extends State<HomePage> {
               );
             },
           ),
-
           Expanded(
             child: SingleChildScrollView(
-              child: FutureBuilder<List<MobileMenuModel>>(
-                future: _menuFuture,
-                builder: (context, snapshot) {
-                  if (snapshot.connectionState ==
-                      ConnectionState.waiting) {
-                    return const Padding(
-                      padding: EdgeInsets.all(24),
-                      child: Center(child: CircularProgressIndicator()),
-                    );
-                  }
+              child: BlocBuilder<ThemeBloc, ThemeState>(
+                builder: (context, themeState) {
+                  // ✅ Get theme from ThemeBloc
+                  final bool isDark = themeState.themeMode == ThemeMode.dark;
+                  final menuFuture = _menuFutureForTheme(themeState.themeMode);
 
-                  if (!snapshot.hasData || snapshot.hasError) {
-                    return const SizedBox();
-                  }
+                  return FutureBuilder<List<MobileMenuModel>>(
+                    key: ValueKey(themeState.themeMode),
+                    future: menuFuture,
+                    builder: (context, snapshot) {
+                      if (snapshot.connectionState == ConnectionState.waiting) {
+                        return const Padding(
+                          padding: EdgeInsets.all(24),
+                          child: Center(child: CircularProgressIndicator()),
+                        );
+                      }
+                      if (snapshot.hasError) {
+                        return Padding(
+                          padding: const EdgeInsets.all(16),
+                          child: Center(
+                            child: Text(
+                              'Failed to load menus. Please try again.',
+                              style: Theme.of(context)
+                                  .textTheme
+                                  .bodyMedium
+                                  ?.copyWith(
+                                    fontWeight: FontWeight.bold,
+                                    color: Colors.red,
+                                  ),
+                            ),
+                          ),
+                        );
+                      }
 
-                  final menus = snapshot.data!;
+                      if (!snapshot.hasData || snapshot.data!.isEmpty) {
+                        return Padding(
+                          padding: const EdgeInsets.all(16),
+                          child: Center(
+                            child: Text(
+                              'No menus available at the moment.',
+                              style: Theme.of(context)
+                                  .textTheme
+                                  .bodyMedium
+                                  ?.copyWith(
+                                    fontWeight: FontWeight.bold,
+                                    color: Colors.grey,
+                                  ),
+                            ),
+                          ),
+                        );
+                      }
 
-                  /// 🔹 Banner from API (menuName == Banner)
-                  final banner = menus.firstWhere(
+                      final menus = snapshot.data!;
+                      final banner = menus.firstWhere(
                         (e) => e.menuName == 'Banner',
-                    orElse: () => MobileMenuModel(
-                      slNo: 0,
-                      menuName: '',
-                      menuImage: '',
-                      imageUrl: AppImages.banner,
-                    ),
-                  );
-
-                  /// 🔹 Grid menus (exclude Banner)
-                  final gridMenus =
-                  menus.where((e) => e.menuName != 'Banner').toList();
-
-                  return Column(
-                    children: [
-                      /// ================= BANNER =================
-                      Padding(
-                        padding: const EdgeInsets.all(16),
-                        child: ClipRRect(
-                          borderRadius: BorderRadius.circular(16),
-                          child: Image.network(
-                            banner.imageUrl,
-                            height: 160,
-                            width: double.infinity,
-                            fit: BoxFit.fill,
-                            loadingBuilder: (context, child, progress) {
-                              if (progress == null) return child;
-                              return const Center(
-                                child: CircularProgressIndicator(),
-                              );
-                            },
-                            errorBuilder: (context, error, stackTrace) {
-                              return Container(
-                                height: 160,
-                                alignment: Alignment.center,
-                                child: const Icon(Icons.image_not_supported),
-                              );
-                            },
-                          ),
+                        orElse: () => MobileMenuModel(
+                          slNo: 0,
+                          menuName: '',
+                          menuImage: '',
+                          imageUrl: AppImages.banner,
                         ),
-                      ),
+                      );
 
+                      final gridMenus =
+                          menus.where((e) => e.menuName != 'Banner').toList();
 
-                      /// ================= GRID =================
-                      Padding(
-                        padding: const EdgeInsets.symmetric(horizontal: 12),
-                        child: GridView.builder(
-                          shrinkWrap: true,
-                          physics:
-                          const NeverScrollableScrollPhysics(),
-                          gridDelegate:
-                          const SliverGridDelegateWithFixedCrossAxisCount(
-                            crossAxisCount: 2,
-                            childAspectRatio: 1.15,
-                            crossAxisSpacing: 12,
-                            mainAxisSpacing: 12,
+                      return Column(
+                        children: [
+                          // -------- BANNER --------
+                          Padding(
+                            padding: const EdgeInsets.all(16),
+                            child: ClipRRect(
+                              borderRadius: BorderRadius.circular(16),
+                              child: Image.network(
+                                banner.imageUrl,
+                                height: 160,
+                                width: double.infinity,
+                                fit: BoxFit.fill,
+                              ),
+                            ),
                           ),
-                          itemCount: gridMenus.length,
-                          itemBuilder: (context, index) {
-                            final menu = gridMenus[index];
 
-                            return _homeAction(
-                              context,
-                              title: menu.menuName,
-                              imageUrl: menu.imageUrl,
-                              onTap: () {
-                                Navigator.pushNamed(
+                          // -------- GRID --------
+                          Padding(
+                            padding: const EdgeInsets.symmetric(horizontal: 12),
+                            child: GridView.builder(
+                              shrinkWrap: true,
+                              physics: const NeverScrollableScrollPhysics(),
+                              gridDelegate:
+                                  const SliverGridDelegateWithFixedCrossAxisCount(
+                                crossAxisCount: 2,
+                                childAspectRatio: 1.15,
+                                crossAxisSpacing: 12,
+                                mainAxisSpacing: 12,
+                              ),
+                              itemCount: gridMenus.length,
+                              itemBuilder: (context, index) {
+                                final menu = gridMenus[index];
+                                final title = langCode == 'or'
+                                    ? (menu.odiaMenuName ?? menu.menuName)
+                                    : menu.menuName;
+
+                                return _homeAction(
                                   context,
-                                  _routeFromMenu(menu.menuName),
+                                  title: title,
+                                  imageUrl: menu.imageUrl,
+                                  onTap: () {
+                                    Navigator.pushNamed(
+                                      context,
+                                      _routeFromMenu(menu.menuName),
+                                    );
+                                  },
+                                  isDark: isDark, // ✅ Pass theme state
                                 );
                               },
-                            );
-                          },
-                        ),
-                      ),
-
-                      const SizedBox(height: 20),
-                    ],
+                            ),
+                          ),
+                          const SizedBox(height: 20),
+                        ],
+                      );
+                    },
                   );
                 },
               ),
@@ -183,24 +224,27 @@ class _HomePageState extends State<HomePage> {
     );
   }
 
-  // ================= CARD (UI UNCHANGED) =================
+  /// Custom card for grid
   Widget _homeAction(
-      BuildContext context, {
-        required String title,
-        required String imageUrl,
-        required VoidCallback onTap,
-      }) {
+    BuildContext context, {
+    required String title,
+    required String imageUrl,
+    required VoidCallback onTap,
+    required bool isDark,
+  }) {
     return InkWell(
       onTap: onTap,
       borderRadius: BorderRadius.circular(14),
       child: Container(
         padding: const EdgeInsets.all(16),
         decoration: BoxDecoration(
-          color: Theme.of(context).cardColor,
+          color: isDark ? const Color(0xFF1A1D23) : Colors.white,
           borderRadius: BorderRadius.circular(14),
           boxShadow: [
             BoxShadow(
-              color: Colors.black.withOpacity(0.06),
+              color: isDark
+                  ? Colors.black.withOpacity(0.25)
+                  : Colors.grey.withOpacity(0.15),
               blurRadius: 8,
               offset: const Offset(0, 3),
             ),
@@ -212,14 +256,18 @@ class _HomePageState extends State<HomePage> {
             CircleAvatar(
               radius: 30,
               backgroundColor:
-              Theme.of(context).primaryColor.withOpacity(0.12),
+                  isDark ? Colors.white : Colors.black12,
               child: Image.network(
                 imageUrl,
                 width: 32,
                 height: 32,
                 fit: BoxFit.contain,
                 errorBuilder: (_, __, ___) {
-                  return const Icon(Icons.image_not_supported, size: 24);
+                  return Icon(
+                    Icons.image_not_supported,
+                    size: 24,
+                    color: isDark ? Colors.white70 : Colors.black54,
+                  );
                 },
                 loadingBuilder: (context, child, loadingProgress) {
                   if (loadingProgress == null) return child;
@@ -231,21 +279,56 @@ class _HomePageState extends State<HomePage> {
                 },
               ),
             ),
-
             const SizedBox(height: 12),
             Text(
               title,
               textAlign: TextAlign.center,
               maxLines: 2,
               overflow: TextOverflow.ellipsis,
-              style: const TextStyle(
+              style: TextStyle(
                 fontWeight: FontWeight.w600,
                 fontSize: 15,
+                color: isDark ? Colors.white : Colors.black,
               ),
             ),
           ],
         ),
       ),
+    );
+  }
+
+  /// Drawer menu
+  Widget _buildMenuDrawer(BuildContext context, String langCode) {
+    return BlocBuilder<ThemeBloc, ThemeState>(
+      builder: (context, themeState) {
+        return Drawer(
+          child: SafeArea(
+            child: FutureBuilder<List<MobileMenuModel>>(
+              key: ValueKey(themeState.themeMode),
+              future: _menuFutureForTheme(themeState.themeMode),
+              builder: (context, snapshot) {
+                if (snapshot.connectionState == ConnectionState.waiting) {
+                  return const Center(child: CircularProgressIndicator());
+                }
+
+                if (!snapshot.hasData || snapshot.hasError) {
+                  return const Center(child: Text('Menu load failed'));
+                }
+
+                final menus = snapshot.data!;
+
+                return HomeMenuHelper.buildDrawerMenu(
+                  context: context,
+                  menus: menus,
+                  langCode: langCode,
+                  selectedMenuName: null,
+                  themeMode: themeState.themeMode,
+                );
+              },
+            ),
+          ),
+        );
+      },
     );
   }
 }

@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:oscw/core/local_storage/preferences.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-
 import '../../../../core/localization/app_localizations.dart';
 import '../../../../core/di/injector.dart';
 import '../../../../core/constants/app_icons.dart';
@@ -70,22 +70,94 @@ class _SettingsBody extends StatelessWidget {
               const SizedBox(height: 12),
 
               /// 🚪 LOGOUT
-              _SettingsTile(
-                icon: AppIcons.logout,
-                title: t.translate("logout"),
-                onTap: () async {
-                  final prefs = await SharedPreferences.getInstance();
-                  await prefs.clear();
+                    _SettingsTile(
+                        icon: AppIcons.logout,
+                        title: t.translate("logout"),
+  onTap: () async {
+    if (!context.mounted) return;
 
-                  if (!context.mounted) return;
-
-                  Navigator.of(context, rootNavigator: true)
-                      .pushNamedAndRemoveUntil(
-                    AppRoutes.login,
-                        (_) => false,
-                  );
-                },
+    final shouldLogout = await showDialog<bool>(
+      context: context,
+      barrierDismissible: false,
+      builder: (dialogContext) => AlertDialog(
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(16),
+        ),
+        title: Row(
+          children: [
+            const Icon(Icons.warning_amber_rounded, color: Colors.orange),
+            const SizedBox(width: 8),
+            Expanded(
+              child: Text(
+                t.translate("logout"),
+                style: const TextStyle(
+                  fontWeight: FontWeight.bold,
+                  fontSize: 18,
+                ),
               ),
+            ),
+          ],
+        ),
+        content: Text(
+          t.translate("logout_confirmation"), // "Are you sure you want to logout?"
+          style: const TextStyle(fontSize: 16),
+        ),
+        contentPadding: const EdgeInsets.fromLTRB(24, 20, 24, 0),
+        actionsPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
+        actions: [
+          Column(
+            crossAxisAlignment: CrossAxisAlignment.stretch,
+            children: [
+              OutlinedButton(
+                onPressed: () => Navigator.pop(dialogContext, false), // Cancel
+                style: OutlinedButton.styleFrom(
+                  padding: const EdgeInsets.symmetric(vertical: 14),
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(12),
+                  ),
+                ),
+                child: Text(
+                  t.translate("cancel"),
+                  style: const TextStyle(color: Colors.grey, fontSize: 16),
+                ),
+              ),
+              const SizedBox(height: 12),
+              ElevatedButton(
+                onPressed: () => Navigator.pop(dialogContext, true), // Logout
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: Colors.red,
+                  padding: const EdgeInsets.symmetric(vertical: 14),
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(12),
+                  ),
+                ),
+                child: Text(
+                  t.translate("yes_logout"),
+                  style: const TextStyle(color: Colors.white, fontSize: 16),
+                ),
+              ),
+            ],
+          ),
+        ],
+      ),
+    );
+
+    // Perform logout if confirmed
+    if (shouldLogout == true) {
+      final prefs = Preferences(await SharedPreferences.getInstance());
+      await prefs.clearMobile();
+      await prefs.clearAll();
+
+      if (!context.mounted) return;
+
+      Navigator.of(context, rootNavigator: true).pushNamedAndRemoveUntil(
+        AppRoutes.login,
+        (_) => false,
+      );
+    }
+  },
+),
+
             ],
           );
         },
@@ -105,8 +177,6 @@ class _SettingsBody extends StatelessWidget {
         return _BottomSheet(
           title: t.translate("choose_theme"),
           children: [
-            _radioTile(context, t.translate("system_default"), "system",
-                selected, context.read<SettingsBloc>().updateTheme),
             _radioTile(context, t.translate("light"), "light",
                 selected, context.read<SettingsBloc>().updateTheme),
             _radioTile(context, t.translate("dark"), "dark",
@@ -131,8 +201,8 @@ class _SettingsBody extends StatelessWidget {
           children: [
             _radioTile(context, "English", "en", selected,
                 context.read<SettingsBloc>().updateLanguage),
-            _radioTile(context, "हिंदी", "hi", selected,
-                context.read<SettingsBloc>().updateLanguage),
+            // _radioTile(context, "हिंदी", "hi", selected,
+            //     context.read<SettingsBloc>().updateLanguage),
             _radioTile(context, "ଓଡ଼ିଆ", "or", selected,
                 context.read<SettingsBloc>().updateLanguage),
           ],

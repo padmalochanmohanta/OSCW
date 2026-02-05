@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:oscw/core/localization/app_localizations.dart';
+import 'package:oscw/shared_widgets/app_app_bar.dart';
 import 'package:url_launcher/url_launcher.dart';
 
 import '../../../core/theme/app_text_styles.dart';
@@ -31,10 +33,12 @@ class _WhatsAppComplaintPageState extends State<WhatsAppComplaintPage> {
 
   @override
   Widget build(BuildContext context) {
+    final t = AppLocalizations.of(context); // For accessing translations
+
     return Scaffold(
-      appBar: AppBar(
-        title: const Text('WhatsApp Complaint'),
-        centerTitle: true,
+     appBar:  AppAppBar(
+          title: t.translate("whatsappComplaintTitle"),
+        showBack: true,
       ),
       body: Padding(
         padding: const EdgeInsets.all(20),
@@ -48,9 +52,9 @@ class _WhatsAppComplaintPageState extends State<WhatsAppComplaintPage> {
             ),
             const SizedBox(height: 20),
 
-            const Text(
-              'Register Complaint via WhatsApp',
-              style: TextStyle(
+            Text(
+              t.translate('whatsappComplaintSubtitle'), // Localized subtitle
+              style: const TextStyle(
                 fontSize: 20,
                 fontWeight: FontWeight.w600,
               ),
@@ -59,10 +63,10 @@ class _WhatsAppComplaintPageState extends State<WhatsAppComplaintPage> {
 
             const SizedBox(height: 12),
 
-            const Text(
-              'Tap the button below to open WhatsApp and send your complaint message.',
+            Text(
+              t.translate('whatsappComplaintInstruction'), // Localized instruction
               textAlign: TextAlign.center,
-              style: TextStyle(color: Colors.grey),
+              style: const TextStyle(color: Colors.grey),
             ),
 
             const SizedBox(height: 30),
@@ -70,18 +74,18 @@ class _WhatsAppComplaintPageState extends State<WhatsAppComplaintPage> {
             SizedBox(
               width: double.infinity,
               child: ElevatedButton.icon(
-                icon: const Icon(Icons.chat,
+                icon: const Icon(
+                  Icons.chat,
                   color: Colors.white,
                 ),
-                label: const Text(
-                  'Open WhatsApp',
+                label: Text(
+                  t.translate('openWhatsAppButton'), // Localized button text
                   style: AppTextStyles.button,
                 ),
                 style: ElevatedButton.styleFrom(
                   backgroundColor: Colors.green,
                   padding: const EdgeInsets.symmetric(vertical: 14),
                 ),
-
                 onPressed: _openWhatsApp,
               ),
             ),
@@ -91,3 +95,4 @@ class _WhatsAppComplaintPageState extends State<WhatsAppComplaintPage> {
     );
   }
 }
+

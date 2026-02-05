@@ -11,7 +11,6 @@ class AppToast {
         Duration duration = const Duration(seconds: 3),
       }) {
     final overlay = Overlay.of(context);
-    if (overlay == null) return;
 
     late OverlayEntry entry;
 
@@ -43,7 +42,7 @@ class _ToastWidget extends StatelessWidget {
   });
 
   Color _bgColor(BuildContext context) {
-    final isDark = Theme.of(context).brightness == Brightness.dark;
+    //final isDark = Theme.of(context).brightness == Brightness.dark;
 
     switch (type) {
       case ToastType.success:
@@ -53,8 +52,7 @@ class _ToastWidget extends StatelessWidget {
       case ToastType.warning:
         return AppColors.warning;
       case ToastType.info:
-      default:
-        return AppColors.primary;
+      return AppColors.primary;
     }
   }
 
@@ -67,8 +65,7 @@ class _ToastWidget extends StatelessWidget {
       case ToastType.warning:
         return Icons.warning_amber_outlined;
       case ToastType.info:
-      default:
-        return Icons.info_outline;
+      return Icons.info_outline;
     }
   }
 

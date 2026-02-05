@@ -23,10 +23,9 @@ import 'core/localization/app_localizations.dart';
 // Internet
 import 'core/internet/internet_bloc.dart';
 import 'core/internet/internet_event.dart';
-import 'core/internet/internet_state.dart';
+
 
 // Screens
-import 'features/splash/presentation/splash_page.dart';
 
 class OSCWApp extends StatelessWidget {
   const OSCWApp({super.key});
@@ -85,6 +84,7 @@ class OSCWApp extends StatelessWidget {
                 theme: AppTheme.lightTheme,
                 darkTheme: AppTheme.darkTheme,
                 themeMode: themeState.themeMode,
+                
 
                 // -------------------------------
                 // INITIAL SCREEN

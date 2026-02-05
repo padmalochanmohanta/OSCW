@@ -1,6 +1,7 @@
 {
   "app_title": "OSCW",
   "home_title": "ମହିଳା କମିଶନ",
+  "appHeader": "ଓଏସସିଡବ୍ଲ୍ୟୁ – ଓଡ଼ିଶା ସରକାର",
   "settings_title": "ସେଟିଂସ୍",
   "theme_label": "ଥିମ୍",
   "theme_light": "ଲାଇଟ୍",
@@ -155,6 +156,59 @@
   "enter_mobile_number": "ଦୟାକରି ମୋବାଇଲ୍ ନମ୍ବର ଲେଖନ୍ତୁ",
   "invalid_mobile_number": "ଦୟାକରି ସଠିକ 10 ଅଙ୍କର ମୋବାଇଲ୍ ନମ୍ବର ଲେଖନ୍ତୁ",
   "permanent_address": "ସ୍ଥାୟୀ ଠିକଣା",
-  "same_as_present_address": "ବର୍ତ୍ତମାନ ଠିକଣା ସହିତ ସମାନ"
+  "same_as_present_address": "ବର୍ତ୍ତମାନ ଠିକଣା ସହିତ ସମାନ",
+  "relationship": "ସମ୍ପର୍କ",
+  "husband": "ସ୍ୱାମୀ",
+  "brother_in_law": "ଦେଉର / ଜାମାଇ",
+  "neighbours": "ପଡ଼ୋଶୀ",
+  "number_of_children": "ସନ୍ତାନ ସଂଖ୍ୟା",
+  "category": "ଶ୍ରେଣୀ",
+  "general": "ସାଧାରଣ",
+  "sebc": "SEBC",
+  "obc": "OBC",
+  "sc": "SC",
+  "st": "ST",
+  "detail_of_opposite_party": "ପ୍ରତିଦ୍ୱନ୍ଦୀ ପକ୍ଷର ବିବରଣୀ",
+  "occupation": "ପେଶା",
+  "monthly_income": "ମାସିକ ଆୟ",
+  "opposite_party_email": "ବିପରୀତ ପକ୍ଷର ଇମେଲ୍",
+  "enter_relationship": "ସମ୍ବନ୍ଧ ଲେଖନ୍ତୁ",
+  "please_enter_relationship": "ଦୟାକରି ସମ୍ବନ୍ଧ ଲେଖନ୍ତୁ",
+  "select_post_office": "ପୋଷ୍ଟ ଅଫିସ ଚୟନ କରନ୍ତୁ",
+  "no_post_office_available": "କୌଣସି ପୋଷ୍ଟ ଅଫିସ ଉପଲବ୍ଧ ନୁହେଁ",
+  "trackComplaintTitle": "ଆପଣଙ୍କର ଅଭିଯୋଗ ଟ୍ର୍ୟାକ୍ କରନ୍ତୁ",
+  "trackComplaintDesc": "ଅଭିଯୋଗ ID, Reference No କିମ୍ବା Phone Number ବ୍ୟବହାର କରି ସନ୍ଧାନ କରନ୍ତୁ",
+  "complaintId": "ଅଭିଯୋଗ ID",
+  "referenceNo": "Reference No",
+  "phoneNumber": "Phone Number",
+  "searchHint": "ଖୋଜିବା ପାଇଁ ମୂଲ୍ୟ ପ୍ରବେଶ କରନ୍ତୁ...",
+  "noComplaint": "କୌଣସି ଅଭିଯୋଗ ମିଳିଲା ନାହିଁ",
+  "enterValueSearch": "ମୂଲ୍ୟ ପ୍ରବେଶ କରନ୍ତୁ ଏବଂ ଖୋଜନ୍ତୁ",
+  "errorOccurred": "ତ୍ରୁଟି: {message}",
+  "whatsappComplaintTitle": "ହ୍ୱାଟ୍ସଆପ୍ ଅଭିଯୋଗ",
+  "whatsappComplaintSubtitle": "ହ୍ୱାଟ୍ସଆପ୍ ଦ୍ୱାରା ଅଭିଯୋଗ ରେଜିଷ୍ଟର କରନ୍ତୁ",
+  "whatsappComplaintInstruction": "ହ୍ୱାଟ୍ସଆପ୍ ଖୋଲି ଅଭିଯୋଗ ମେସେଜ୍ ପଠାଇବା ପାଇଁ ନିମ୍ନଲିଖିତ ବଟନ୍ ଉପରେ ଟ୍ୟାପ୍ କରନ୍ତୁ।",
+  "openWhatsAppButton": "ହ୍ୱାଟ୍ସଆପ୍ ଖୋଲନ୍ତୁ",
+  "caption": "ସନ୍ଦେଶ",
+  "skip": "ଛାଡ଼ନ୍ତୁ",
+  "logout_confirmation": "ଆପଣ ନିଶ୍ଚିତ ଭାବେ ଲଗ୍‌ଆଉଟ୍ କରିବାକୁ ଚାହାଁଛନ୍ତି କି?",
+  "yes_logout": "ହଁ, ଲଗ୍‌ଆଉଟ୍",
+  "confirm_mobile_number": "ମୋବାଇଲ୍ ନମ୍ବର ସୂଚନା",
+  "mobile_number_used_for_updates": "ଏହି ନମ୍ବର ଅଭିଯୋଗ ଅଦ୍ୟତନ ପାଇଁ ବ୍ୟବହୃତ ହେବ",
+  "change_number": "ନମ୍ବର ବଦଳାନ୍ତୁ",
+  "proceed": "ଆଗକୁ ବଢ଼ନ୍ତୁ",
+  "enterValueToSearch": "ସର୍ଚ୍ଚ କରିବା ପାଇଁ ଏକ ମୂଲ୍ୟ ଦିଅନ୍ତୁ",
+  "noComplaintFound": "କୋଣସି ଅଭିଯୋଗ ମିଳିଲା ନାହିଁ",
+  "errorMessage": "ତ୍ରୁଟି",
+   "reference_no": "ସନ୍ଦର୍ଭ ନମ୍ବର",
+  "phone_number": "ଫୋନ୍ ନମ୍ବର"
 
 }
+
+
+
+
+
+
+ 
+

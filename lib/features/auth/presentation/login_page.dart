@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-
+import 'package:oscw/core/local_storage/preferences.dart';
 import '../../../core/internet/internet_bloc.dart';
 import '../../../core/internet/internet_state.dart';
 import '../../../routes/app_routes.dart';
@@ -10,6 +10,7 @@ import '../../../shared_widgets/app_toast.dart';
 import '../../../shared_widgets/no_internet_banner.dart';
 import '../data/auth_remote_datasource.dart';
 import '../data/auth_repository_impl.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 class LoginPage extends StatefulWidget {
   const LoginPage({super.key});
@@ -30,6 +31,22 @@ class _LoginPageState extends State<LoginPage> {
     _authRepo = AuthRepositoryImpl(AuthRemoteDataSource());
   }
 
+  @override
+  void dispose() {
+  _mobileCtrl.dispose();
+  super.dispose();
+}
+
+void _onSkip(BuildContext context) {
+  Navigator.pushNamedAndRemoveUntil(
+        context,
+        AppRoutes.mainNav,
+            (_) => false,
+      );
+}
+
+
+
   Future<void> _onSendOtp(BuildContext context) async {
     final mobile = _mobileCtrl.text.trim();
     final t = AppLocalizations.of(context);
@@ -46,6 +63,7 @@ class _LoginPageState extends State<LoginPage> {
     setState(() => _loading = true);
 
     try {
+     await _saveMobile(mobile);
       final response = await _authRepo.generateOtp(mobile);
 
       AppToast.show(
@@ -54,11 +72,20 @@ class _LoginPageState extends State<LoginPage> {
         type: ToastType.success,
       );
 
+      // Navigator.pushNamed(
+      //   context,
+      //   AppRoutes.verifyOtp,
+      //   arguments: response, // ✅ FULL RESPONSE
+      // );
       Navigator.pushNamed(
-        context,
-        AppRoutes.verifyOtp,
-        arguments: response, // ✅ FULL RESPONSE
-      );
+            context,
+            AppRoutes.verifyOtp,
+            arguments: {
+            "response": response,
+            "redirectRoute": AppRoutes.mainNav, 
+          },
+       );
+
     } catch (e) {
       AppToast.show(
         context,
@@ -156,23 +183,74 @@ class _LoginPageState extends State<LoginPage> {
 
                     const SizedBox(height: 24),
 
-                    SizedBox(
-                      width: double.infinity,
-                      height: 52,
-                      child: ElevatedButton(
-                        onPressed:
-                        _loading ? null : () => _onSendOtp(context),
-                        child: _loading
-                            ? const CircularProgressIndicator(
-                          color: Colors.white,
-                        )
-                            : Text(
-                          t.translate("send_otp"),
-                          style: theme.textTheme.titleMedium
-                              ?.copyWith(fontWeight: FontWeight.w600),
-                        ),
-                      ),
-                    ),
+                    // SizedBox(
+                    //   width: double.infinity,
+                    //   height: 52,
+                    //   child: ElevatedButton(
+                    //     onPressed:
+                    //     _loading ? null : () => _onSendOtp(context),
+                    //     child: _loading
+                    //         ? const CircularProgressIndicator(
+                    //       color: Colors.white,
+                    //     )
+                    //         : Text(
+                    //       t.translate("send_otp"),
+                    //       style: theme.textTheme.titleMedium
+                    //           ?.copyWith(fontWeight: FontWeight.w600),
+                    //     ),
+                    //   ),
+                    // ),
+
+                    Row(
+                      children: [
+                          /// SKIP BUTTON
+                         Expanded(
+                            child: SizedBox(
+                             height: 52,
+                             child: OutlinedButton(
+                             onPressed: () => _onSkip(context),
+                             style: OutlinedButton.styleFrom(
+                             shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(12),
+            ),
+          ),
+          child: Text(
+            t.translate("skip"),
+            style: theme.textTheme.titleMedium
+                ?.copyWith(fontWeight: FontWeight.w600),
+          ),
+        ),
+      ),
+    ),
+
+    const SizedBox(width: 12),
+
+    /// SEND OTP / LOGIN BUTTON
+    Expanded(
+      child: SizedBox(
+        height: 52,
+        child: ElevatedButton(
+          onPressed: _loading ? null : () => _onSendOtp(context),
+          child: _loading
+              ? const SizedBox(
+                  width: 22,
+                  height: 22,
+                  child: CircularProgressIndicator(
+                    strokeWidth: 2,
+                    color: Colors.white,
+                  ),
+                )
+              : Text(
+                  t.translate("send_otp"), // or "login"
+                  style: theme.textTheme.titleMedium
+                      ?.copyWith(fontWeight: FontWeight.w600),
+                ),
+        ),
+      ),
+    ),
+  ],
+),
+
                   ],
                 ),
               ),
@@ -191,4 +269,10 @@ class _LoginPageState extends State<LoginPage> {
       ),
     );
   }
+  
+Future<void> _saveMobile(String mobile) async {
+  final prefs = Preferences(await SharedPreferences.getInstance());
+  await prefs.setMobile(mobile); 
+}
+
 }

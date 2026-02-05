@@ -1,6 +1,5 @@
 // lib/features/settings/data/datasources/settings_local_datasource.dart
 import '../../../../core/local_storage/preferences.dart';
-import '../../../../core/local_storage/prefs_keys.dart';
 
 class SettingsLocalDataSource {
   final Preferences prefs;

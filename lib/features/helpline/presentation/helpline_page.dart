@@ -42,56 +42,56 @@ class _HelplinePageState extends State<HelplinePage> {
     }
   }
 
-  /// 🔹 UI UNCHANGED
+
   Widget _helplineTile({
-    required String title,
-    required String number,
-    required IconData icon,
-    required Color color,
-  }) {
-    return InkWell(
-      onTap: () => _callNumber(number),
-      borderRadius: BorderRadius.circular(14),
-      child: Container(
-        padding: const EdgeInsets.all(14),
-        decoration: BoxDecoration(
-          color: color.withOpacity(0.12),
-          borderRadius: BorderRadius.circular(14),
-          border: Border.all(color: color, width: 1.2),
-        ),
-        child: Row(
-          children: [
-            CircleAvatar(
-              backgroundColor: color,
-              child: Icon(icon, color: Colors.white),
-            ),
-            const SizedBox(width: 14),
-            Expanded(
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(
-                    title,
-                    style: AppTextStyles.body
-                        .copyWith(fontWeight: FontWeight.w600),
-                  ),
-                  const SizedBox(height: 4),
-                  Text(
-                    number,
-                    style: AppTextStyles.bodySmall.copyWith(
-                      color: color,
-                      fontWeight: FontWeight.bold,
-                    ),
-                  ),
-                ],
-              ),
-            ),
-            Icon(Icons.call, color: color),
-          ],
-        ),
+  required String title,
+  required String number,
+  required IconData icon,
+  required Color color,
+}) {
+  return InkWell(
+    onTap: () => _callNumber(number),
+    borderRadius: BorderRadius.circular(14),
+    child: Container(
+      padding: const EdgeInsets.all(14),
+      decoration: BoxDecoration(
+        color: color.withOpacity(0.12),
+        borderRadius: BorderRadius.circular(14),
+        border: Border.all(color: color, width: 1.2),
       ),
-    );
-  }
+      child: Row(
+        children: [
+          CircleAvatar(
+            backgroundColor: color,
+            child: Icon(icon, color: Colors.white),
+          ),
+          const SizedBox(width: 14),
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  title,
+                  style: AppTextStyles.body.copyWith(fontWeight: FontWeight.w600),
+                ),
+                const SizedBox(height: 4),
+                Text(
+                  number,
+                  style: AppTextStyles.bodySmall.copyWith(
+                    color: color,
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
+              ],
+            ),
+          ),
+          Icon(Icons.call, color: color),
+        ],
+      ),
+    ),
+  );
+}
+
 
   /// 🔹 SAME COLORS AS BEFORE
   Color _getColor(int index) {
@@ -126,7 +126,7 @@ class _HelplinePageState extends State<HelplinePage> {
   @override
   Widget build(BuildContext context) {
     final t = AppLocalizations.of(context);
-
+    final langCode = Localizations.localeOf(context).languageCode;
     return Scaffold(
       appBar: AppAppBar(
         title: t.translate('helpline_numbers'),
@@ -180,10 +180,13 @@ class _HelplinePageState extends State<HelplinePage> {
                     const SizedBox(height: 12),
                     itemBuilder: (context, index) {
                       final item = list[index];
+                    
+                    final helplineTitle = langCode == 'or' ? item.odiaHelplineName : item.helplineName;
+                    final helplineNumber = langCode == 'or' ? item.odiaHelplineNo : item.helplineNo;
 
                       return _helplineTile(
-                        title: item.helplineName,
-                        number: item.helplineNo,
+                         title: helplineTitle,
+                         number: helplineNumber,
                         icon: _getIcon(index),
                         color: _getColor(index),
                       );

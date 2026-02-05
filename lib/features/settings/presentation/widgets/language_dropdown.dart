@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import '../../../../core/localization/app_localizations.dart';
 
 class LanguageSelectorRow extends StatelessWidget {
   final String selected;
@@ -13,7 +12,7 @@ class LanguageSelectorRow extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final t = AppLocalizations.of(context);
+  //  final t = AppLocalizations.of(context);
 
     return Card(
       elevation: 2,

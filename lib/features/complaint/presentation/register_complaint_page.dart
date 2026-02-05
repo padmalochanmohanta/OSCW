@@ -1,4 +1,9 @@
 import 'package:flutter/material.dart';
+import 'package:oscw/core/local_storage/preferences.dart';
+import 'package:oscw/features/auth/data/auth_remote_datasource.dart';
+import 'package:oscw/features/auth/data/auth_repository_impl.dart';
+import 'package:oscw/shared_widgets/app_toast.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 import '../../../core/localization/app_localizations.dart';
 import '../../../core/theme/app_colors.dart';
@@ -12,10 +17,11 @@ class RegisterComplaintPage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final t = AppLocalizations.of(context);
+   
 
     return Scaffold(
-      appBar: const AppAppBar(
-        title: 'OSCW – Government of Odisha',
+      appBar:  AppAppBar(
+          title: t.translate("appHeader"),
         showBack: true,
       ),
       body: SingleChildScrollView(
@@ -119,10 +125,12 @@ class RegisterComplaintPage extends StatelessWidget {
                   ),
                 ),
                 onPressed: () {
-                  Navigator.pushNamed(
-                    context,
-                    AppRoutes.giveComplaint,
-                  );
+                  // Navigator.pushNamed(
+                  //   context,
+                  //   AppRoutes.giveComplaint,
+                  // );
+                    _showConfirmMobileDialog(context, editableByDefault: true);
+
                 },
                 child: Text(
                   t.translate('complaint_form_button'),
@@ -148,6 +156,115 @@ class RegisterComplaintPage extends StatelessWidget {
       ),
     );
   }
+
+Future<void> _showConfirmMobileDialog(
+  BuildContext context, {
+  bool editableByDefault = false,
+}) async {
+  final t = AppLocalizations.of(context);
+  final prefs = Preferences(await SharedPreferences.getInstance());
+  final savedMobile = prefs.getMobile();
+
+  bool isEditable = editableByDefault || savedMobile == null;
+  final mobileCtrl = TextEditingController(text: savedMobile ?? "");
+
+  // Keep a reference to the original page context
+  final pageContext = context;
+
+  showDialog(
+    context: context,
+    barrierDismissible: false,
+    builder: (context) {
+      return StatefulBuilder(
+        builder: (dialogContext, setState) {
+          String getButtonText() {
+            final newMobile = mobileCtrl.text.trim();
+            if (isEditable && newMobile != savedMobile) {
+              return t.translate("send_otp");
+            }
+            return t.translate("proceed");
+          }
+
+          return AlertDialog(
+            title: Text(t.translate("confirm_mobile_number")),
+            content: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                TextField(
+                  controller: mobileCtrl,
+                  keyboardType: TextInputType.number,
+                  maxLength: 10,
+                  readOnly: !isEditable,
+                  decoration: InputDecoration(
+                    hintText: t.translate("enter_mobile_number"),
+                    suffixIcon: !isEditable
+                        ? const Icon(Icons.lock_outline)
+                        : const Icon(Icons.edit),
+                  ),
+                  onChanged: (_) => setState(() {}),
+                ),
+                const SizedBox(height: 8),
+                Text(t.translate("mobile_number_used_for_updates")),
+              ],
+            ),
+            actions: [
+              TextButton(
+                onPressed: () {
+                  setState(() => isEditable = true);
+                },
+                child: Text(t.translate("change_number")),
+              ),
+              ElevatedButton(
+                onPressed: () async {
+                  final newMobile = mobileCtrl.text.trim();
+
+                  if (newMobile.length != 10) {
+                    AppToast.show(
+                      pageContext,
+                      message: t.translate("invalid_mobile_number"),
+                      type: ToastType.error,
+                    );
+                    return;
+                  }
+
+                  Navigator.pop(dialogContext); // close dialog
+
+                  if (isEditable && newMobile != savedMobile) {
+                    final authRepo =
+                        AuthRepositoryImpl(AuthRemoteDataSource());
+                    final response = await authRepo.generateOtp(newMobile);
+                    await prefs.setMobile(newMobile);
+
+                    Navigator.pushNamed(
+                      pageContext, // use the page context, NOT dialog context
+                      AppRoutes.verifyOtp,
+                      arguments: {
+                        "response": response,
+                        "redirectRoute": AppRoutes.giveComplaint,
+                      },
+                    );
+                  } else {
+                    Navigator.pushNamed(
+                      pageContext, // use the page context
+                      AppRoutes.giveComplaint,
+                    );
+                  }
+                },
+                child: Text(getButtonText()),
+              ),
+            ],
+          );
+        },
+      );
+    },
+  );
+}
+
+
+
+
+
+
 }
 
 // =====================================================
@@ -167,30 +284,41 @@ class StepBlock extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    final isDark = theme.brightness == Brightness.dark;
+
     return RichText(
       text: TextSpan(
         style: AppTextStyles.body.copyWith(
           height: 1.5,
-          color: AppColors.textDark,
+          color: isDark ? Colors.white : Colors.black, 
         ),
         children: [
           TextSpan(
             text: '$step ',
-            style: const TextStyle(
-              color: AppColors.primary,
+            style: TextStyle(
+              color: AppColors.primary, 
               fontWeight: FontWeight.bold,
             ),
           ),
           TextSpan(
             text: '$title\n',
-            style: const TextStyle(
-              color: AppColors.primary,
+            style: TextStyle(
+              color: AppColors.primary, 
               fontWeight: FontWeight.w600,
             ),
           ),
-          TextSpan(text: description),
+          TextSpan(
+            text: description,
+            style: TextStyle(
+              color: isDark ? Colors.white70 : Colors.grey[800], 
+              fontWeight: FontWeight.w600,
+            ),
+          ),
         ],
       ),
     );
   }
 }
+
+

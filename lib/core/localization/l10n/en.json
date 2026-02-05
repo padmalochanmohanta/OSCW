@@ -1,7 +1,8 @@
 {
   "app_title": "OSCW",
   "home_title": "Mahila Commission",
-  "settings_title": "Settings",
+  "appHeader": "OSCW – Government of Odisha",
+ "settings_title": "Settings",
   "theme_label": "Theme",
   "theme_light": "Light",
   "theme_dark": "Dark",
@@ -88,6 +89,7 @@
   "dowry": "Dowry",
   "harassment": "Harassment",
   "present_address": "PRESENT ADDRESS",
+  "permanent_address": "PERMANENT ADDRESS",
   "other_details": "OTHER DETAILS",
   "attach_document": "ATTACH DOCUMENT",
   "choose_file": "Choose File",
@@ -139,7 +141,59 @@
   "app_footer": "© 2026 OSCW · Government of Odisha",
   "enter_mobile_number": "Please enter mobile number",
   "invalid_mobile_number": "Please enter a valid 10-digit mobile number",
-  "permanent_address": "Permanent Address",
-  "same_as_present_address": "Same as Present Address"
+  "same_as_present_address": "Same as Present Address",
+  "relationship": "Relationship",
+  "husband": "Husband",
+  "brother_in_law": "Brother In Law",
+  "neighbours": "Neighbours",
+  "number_of_children": "Number of Children",
+  "category": "Category",
+  "general": "General",
+  "sebc": "SEBC",
+  "obc": "OBC",
+  "sc": "SC",
+  "st": "ST",
+  "detail_of_opposite_party": "DETAIL OF OPPOSITE PARTY",
+  "occupation": "Occupation",
+  "monthly_income": "Mothly Income",
+  "opposite_party_email": "Opposite Party Mail",
+  "enter_relationship": "Enter relationship",
+  "please_enter_relationship": "Please enter the relationship",
+  "select_post_office": "Select Post Office",
+  "no_post_office_available": "No Post Office Available",
+   "trackComplaintTitle": "Track Your Complaint",
+  "trackComplaintDesc": "Search using Complaint ID, Reference No, or Phone Number",
+  "complaintId": "Complaint ID",
+  "referenceNo": "Reference No",
+  "phoneNumber": "Phone Number",
+  "searchHint": "Enter search value...",
+  "noComplaint": "No complaint found",
+  "enterValueSearch": "Enter value and search",
+  "errorOccurred": "Error: {message}",
+   "whatsappComplaintTitle": "WhatsApp Complaint",
+  "whatsappComplaintSubtitle": "Register Complaint via WhatsApp",
+  "whatsappComplaintInstruction": "Tap the button below to open WhatsApp and send your complaint message.",
+  "openWhatsAppButton": "Open WhatsApp",
+  "caption" : "Caption",
+  "skip" : "Skip",
+  "logout_confirmation": "Are you sure you want to logout?",
+  "yes_logout": "Yes, Logout",
+  "confirm_mobile_number": "Confirm Mobile Number",
+  "mobile_number_used_for_updates": "This number will be used for complaint updates",
+  "change_number": "Change number",
+  "proceed": "Proceed",
+  "enterValueToSearch": "Enter a value to search",
+  "noComplaintFound": "No complaint found",
+  "errorMessage": "Error: {message}",
+   "reference_no": "Reference No",
+  "phone_number": "Phone Number"
+
+
+  
+
+
+
+
+
 
 }
